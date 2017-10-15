@@ -23,6 +23,8 @@ import org.eclipse.gef.ui.parts.ScrollingGraphicalViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowData;
@@ -31,6 +33,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Scale;
@@ -62,6 +65,7 @@ public class DwGraphicalFeatureModelViewer extends DwGraphicalViewerWithZoomSupp
 
 	protected DwFeatureModelWrapped modelWrapped;
 
+	@SuppressWarnings("unused")
 	private boolean lastDateSelected;
 
 	public Date getCurrentSelectedDate() {
@@ -184,7 +188,7 @@ public class DwGraphicalFeatureModelViewer extends DwGraphicalViewerWithZoomSupp
 			}
 		}
 
-		lastDateSelected = true;
+		setLastDateSelected(true);
 		currentSelectedDate = closestDate;	
 	}
 
@@ -236,6 +240,8 @@ public class DwGraphicalFeatureModelViewer extends DwGraphicalViewerWithZoomSupp
 		GraphicalViewer viewer = getGraphicalViewer();
 		viewer.setEditPartFactory(new DwFeatureModelEditPartFactory(viewer, this));
 		viewer.setRootEditPart(new ScalableFreeformRootEditPart());
+		
+		System.out.println("");
 	}
 
 	/**
@@ -260,7 +266,7 @@ public class DwGraphicalFeatureModelViewer extends DwGraphicalViewerWithZoomSupp
 						setCurrentSelectedDate(newDate);
 
 						if(index == modelWrapped.getDates().size()-1)
-							lastDateSelected = true;
+							setLastDateSelected(true);
 					}
 				}
 			}
@@ -357,7 +363,7 @@ public class DwGraphicalFeatureModelViewer extends DwGraphicalViewerWithZoomSupp
 			modelWrapped.addDate(now);
 			setCurrentSelectedDate(now);
 
-			lastDateSelected = true;
+			setLastDateSelected(true);
 		}		
 
 		/**
@@ -380,7 +386,7 @@ public class DwGraphicalFeatureModelViewer extends DwGraphicalViewerWithZoomSupp
 	/**
 	 * Creates the editor and adds a control bar to switch between dates
 	 */
-	@Override
+	//@Override
 	public void createPartControl(Composite parent){
 		parent.setLayout(new GridLayout(2, false));
 
@@ -410,7 +416,7 @@ public class DwGraphicalFeatureModelViewer extends DwGraphicalViewerWithZoomSupp
 		setGraphicalViewer(viewer);
 		configureGraphicalViewer();
 		hookGraphicalViewer();
-		initializeGraphicalViewer();
+		initializeGraphicalViewer();	
 	}
 
 	/**
@@ -430,13 +436,18 @@ public class DwGraphicalFeatureModelViewer extends DwGraphicalViewerWithZoomSupp
 	 */
 	@Override
 	public void handleEvent(Event event) {
+		System.out.println(event);
 		if(event.widget.equals(scale)) {
 			int index = scale.getSelection();
 			currentSelectedDate = modelWrapped.getDates().get(scale.getSelection());
 			setCurrentSelectedDate(currentSelectedDate);
 			
 			if(index == modelWrapped.getDates().size()-1)
-				lastDateSelected = true;
+				setLastDateSelected(true);
 		}
+	}
+
+	public void setLastDateSelected(boolean lastDateSelected) {
+		this.lastDateSelected = lastDateSelected;
 	}
 }

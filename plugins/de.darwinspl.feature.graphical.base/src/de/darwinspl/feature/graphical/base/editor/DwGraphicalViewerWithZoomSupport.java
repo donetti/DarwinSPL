@@ -1,13 +1,16 @@
 package de.darwinspl.feature.graphical.base.editor;
 
+import org.eclipse.gef.GraphicalViewer;
 import org.eclipse.gef.KeyHandler;
 import org.eclipse.gef.KeyStroke;
 import org.eclipse.gef.MouseWheelHandler;
 import org.eclipse.gef.MouseWheelZoomHandler;
 import org.eclipse.gef.editparts.ZoomManager;
+import org.eclipse.gef.ui.actions.DirectEditAction;
 import org.eclipse.gef.ui.actions.ZoomInAction;
 import org.eclipse.gef.ui.actions.ZoomOutAction;
 import org.eclipse.gef.ui.parts.GraphicalEditor;
+import org.eclipse.gef.ui.parts.GraphicalViewerKeyHandler;
 import org.eclipse.swt.SWT;
 
 /**
@@ -19,8 +22,6 @@ import org.eclipse.swt.SWT;
  *
  */
 public abstract class DwGraphicalViewerWithZoomSupport extends GraphicalEditor{
-	// handles additional shortcuts
-	protected KeyHandler sharedKeyHandler;
 	
 	/**
 	 * Adds zooming support with the keys ctrl & +/-.
@@ -29,15 +30,16 @@ public abstract class DwGraphicalViewerWithZoomSupport extends GraphicalEditor{
 	protected KeyHandler getCommonKeyHandler() {
 		ZoomManager manager = (ZoomManager) getGraphicalViewer().getProperty(ZoomManager.class.toString());
 
-		if (sharedKeyHandler == null) {
-			sharedKeyHandler = new KeyHandler();
-			sharedKeyHandler.put(KeyStroke.getPressed('+', SWT.KEYPAD_ADD, SWT.CONTROL),
+		KeyHandler keyHandler = getGraphicalViewer().getKeyHandler();
+		if (keyHandler == null) {
+			keyHandler = new GraphicalViewerKeyHandler(getGraphicalViewer());
+			keyHandler.put(KeyStroke.getPressed('+', SWT.KEYPAD_ADD, SWT.CONTROL),
 					new ZoomInAction(manager));
-			sharedKeyHandler.put(KeyStroke.getPressed('-', SWT.KEYPAD_SUBTRACT, SWT.CONTROL),
-					new ZoomOutAction(manager));
+			keyHandler.put(KeyStroke.getPressed('-', SWT.KEYPAD_SUBTRACT, SWT.CONTROL),
+					new ZoomOutAction(manager));			
 		}
-
-		return sharedKeyHandler;
+		
+		return keyHandler;
 	}
 	
 	/**
@@ -66,13 +68,17 @@ public abstract class DwGraphicalViewerWithZoomSupport extends GraphicalEditor{
 	 * Register the zoom in and zoom out action to the zoom manager of the current graphical editor.
 	 */
 	@Override
-	public void configureGraphicalViewer() {
+	public void configureGraphicalViewer() {		
 		super.configureGraphicalViewer();
 
 		ZoomManager manager = (ZoomManager) getGraphicalViewer().getProperty(ZoomManager.class.toString());
 
 		getActionRegistry().registerAction(new ZoomInAction(manager));
 		getActionRegistry().registerAction(new ZoomOutAction(manager));
+		getActionRegistry().registerAction(new DirectEditAction(this));
+		
+		GraphicalViewer viewer = (GraphicalViewer)getGraphicalViewer();
+		viewer.setKeyHandler(getCommonKeyHandler());
 	}	
 	
 	/**

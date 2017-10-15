@@ -4,7 +4,6 @@ import org.eclipse.gef.ui.actions.ActionBarContributor;
 import org.eclipse.gef.ui.actions.DeleteRetargetAction;
 import org.eclipse.gef.ui.actions.ZoomComboContributionItem;
 import org.eclipse.jface.action.IToolBarManager;
-import org.eclipse.ui.actions.ActionFactory;
 
 import de.darwinspl.feature.graphical.editor.actions.DwFeatureModelCreateOverviewAction;
 import de.darwinspl.feature.graphical.editor.actions.DwFeatureModelCreateSVGAction;
@@ -26,9 +25,8 @@ public class DwGraphicalFeatureModelEditorActionBarContributor extends ActionBar
 	}
 
 	@Override
-	public void contributeToToolBar(IToolBarManager toolBarManager) {
+	public void contributeToToolBar(IToolBarManager toolBarManager) {//
 		super.contributeToToolBar(toolBarManager);
-		toolBarManager.add(getAction(ActionFactory.DELETE.getId()));
 		toolBarManager.add(getAction(DwFeatureModelAutoLayoutAction.ID));
 		toolBarManager.add(getAction(DwFeatureModelCreateOverviewAction.FEATUREMODEL_CREATE_OVERVIEW));
 		toolBarManager.add(getAction(DwFeatureModelCreateSVGAction.FEATUREMODEL_CREATE_SVG));

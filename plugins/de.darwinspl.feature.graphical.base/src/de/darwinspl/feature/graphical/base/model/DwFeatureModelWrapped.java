@@ -544,7 +544,7 @@ public class DwFeatureModelWrapped implements PropertyChangeListener {
 			if (date.equals(new Date(Long.MIN_VALUE)) || (composition.getValidSince() != null && date.equals(composition.getValidSince()))) {
 				composition.getFeatures().remove(childFeature.getWrappedModelElement());
 
-				if (composition.getFeatures().isEmpty()) {
+				if (composition.getFeatures().isEmpty() && composition.getCompositionOf().getParentOf().size() == 1) {
 					for (HyFeatureChild featureChild : composition.getCompositionOf().getChildOf()) {
 						featureChild.getParent().getParentOf().remove(featureChild);
 					}

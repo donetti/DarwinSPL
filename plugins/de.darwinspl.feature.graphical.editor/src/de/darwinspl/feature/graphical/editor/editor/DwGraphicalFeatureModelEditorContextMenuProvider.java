@@ -23,6 +23,7 @@ import de.darwinspl.feature.graphical.editor.actions.feature.DwFeatureCreateChil
 import de.darwinspl.feature.graphical.editor.actions.feature.DwFeatureCreateSiblingAction;
 import de.darwinspl.feature.graphical.editor.actions.feature.DwFeatureDeletePermanentlyAction;
 import de.darwinspl.feature.graphical.editor.actions.feature.DwFeatureEditNamesAction;
+import de.darwinspl.feature.graphical.editor.actions.feature.DwFeatureMoveToNewGroupAction;
 import de.darwinspl.feature.graphical.editor.actions.feature.DwSetFeatureLinkAction;
 import de.darwinspl.feature.graphical.editor.actions.group.DwGroupChangeGroupTypeToAlternativeTypeAction;
 import de.darwinspl.feature.graphical.editor.actions.group.DwGroupChangeGroupTypeToAndTypeAction;
@@ -66,14 +67,15 @@ public class DwGraphicalFeatureModelEditorContextMenuProvider extends ContextMen
         menu.appendToGroup(GEFActionConstants.GROUP_EDIT, action);      
         action = getActionRegistry().getAction(DwFeatureChangeTypeAction.FEATURE_CHANGE_TYPE);
         menu.appendToGroup(GEFActionConstants.GROUP_EDIT, action);      
+        action = getActionRegistry().getAction(DwFeatureMoveToNewGroupAction.FEATURE_MOVE_TO_NEW_GROUP);
+        menu.appendToGroup(GEFActionConstants.GROUP_EDIT, action);      
         menu.appendToGroup(GEFActionConstants.GROUP_EDIT, new Separator());
         
-        
-
+      
         action = getActionRegistry().getAction(DwGroupChangeGroupTypeToAlternativeTypeAction.CHANGE_GROUP_TYPE_TO_ALTERNATIVE);
-        menu.appendToGroup(GEFActionConstants.GROUP_EDIT, action);
+        menu.appendToGroup(GEFActionConstants.GROUP_EDIT, action);        
         action = getActionRegistry().getAction(DwGroupChangeGroupTypeToAndTypeAction.CHANGE_GROUP_TYPE_TO_AND);
-        menu.appendToGroup(GEFActionConstants.GROUP_EDIT, action);
+        menu.appendToGroup(GEFActionConstants.GROUP_EDIT, action);      
         action = getActionRegistry().getAction(DwGroupChangeGroupTypeToOrTypeAction.CHANGE_GROUP_TYPE_TO_OR);
         menu.appendToGroup(GEFActionConstants.GROUP_EDIT, action);
         
@@ -117,6 +119,7 @@ public class DwGraphicalFeatureModelEditorContextMenuProvider extends ContextMen
         menu.appendToGroup(GEFActionConstants.GROUP_EDIT, new Separator());
         action = getActionRegistry().getAction(DwSetFeatureLinkAction.ID);
         menu.appendToGroup(GEFActionConstants.GROUP_EDIT, action);
+
 	}
 	
 	public ActionRegistry getActionRegistry() {

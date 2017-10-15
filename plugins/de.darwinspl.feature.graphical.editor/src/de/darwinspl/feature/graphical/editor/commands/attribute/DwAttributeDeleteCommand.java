@@ -2,8 +2,6 @@ package de.darwinspl.feature.graphical.editor.commands.attribute;
 
 import java.util.Date;
 
-import org.eclipse.emf.common.notify.Adapter;
-import org.eclipse.emf.common.notify.impl.NotificationImpl;
 import org.eclipse.gef.commands.Command;
 
 import de.darwinspl.feature.graphical.base.editor.DwGraphicalFeatureModelViewer;

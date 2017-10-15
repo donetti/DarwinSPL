@@ -22,13 +22,18 @@ import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MStackElement;
 import org.eclipse.e4.ui.model.application.ui.basic.impl.BasicFactoryImpl;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
+import org.eclipse.emf.common.util.TreeIterator;
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.gef.GraphicalViewer;
 import org.eclipse.gef.KeyHandler;
 import org.eclipse.gef.KeyStroke;
 import org.eclipse.gef.commands.Command;
 import org.eclipse.gef.commands.CommandStack;
-import org.eclipse.gef.ui.parts.GraphicalViewerKeyHandler;
+import org.eclipse.gef.ui.actions.DirectEditAction;
+import org.eclipse.gef.ui.actions.GEFActionConstants;
+import org.eclipse.gef.ui.actions.ZoomInAction;
+import org.eclipse.jface.action.Action;
 import org.eclipse.swt.SWT;
 import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IEditorPart;
@@ -37,7 +42,6 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.part.FileEditorInput;
 
 import de.darwinspl.feature.graphical.base.editor.DwGraphicalFeatureModelViewer;
@@ -56,6 +60,7 @@ import de.darwinspl.feature.graphical.editor.actions.feature.DwFeatureCreateChil
 import de.darwinspl.feature.graphical.editor.actions.feature.DwFeatureCreateSiblingAction;
 import de.darwinspl.feature.graphical.editor.actions.feature.DwFeatureDeletePermanentlyAction;
 import de.darwinspl.feature.graphical.editor.actions.feature.DwFeatureEditNamesAction;
+import de.darwinspl.feature.graphical.editor.actions.feature.DwFeatureMoveToNewGroupAction;
 import de.darwinspl.feature.graphical.editor.actions.feature.DwSetFeatureLinkAction;
 import de.darwinspl.feature.graphical.editor.actions.group.DwGroupChangeGroupTypeToAlternativeTypeAction;
 import de.darwinspl.feature.graphical.editor.actions.group.DwGroupChangeGroupTypeToAndTypeAction;
@@ -65,6 +70,7 @@ import de.darwinspl.feature.graphical.editor.actions.version.DwVersionCreateVers
 import de.darwinspl.feature.graphical.editor.factory.DwFeatureModelEditorEditPartFactory;
 import eu.hyvar.context.contextValidity.util.HyValidityModelUtil;
 import eu.hyvar.context.information.util.HyContextInformationUtil;
+import eu.hyvar.evolution.HyLinearTemporalElement;
 import eu.hyvar.feature.constraint.util.HyConstraintUtil;
 
 @SuppressWarnings("restriction")
@@ -89,6 +95,22 @@ public class DwGraphicalFeatureModelEditor extends DwGraphicalFeatureModelViewer
 
 		try{
 			DwFeatureModelLayoutFileUtil.saveLayout(modelWrapped);
+			
+			TreeIterator<EObject> iterator = resource.getAllContents();
+			while (iterator.hasNext()) {
+				EObject next = iterator.next();
+				
+				if(next instanceof HyLinearTemporalElement) {
+					HyLinearTemporalElement el = (HyLinearTemporalElement)next;
+					if(el.getValidSince() != null && el.getValidUntil() != null) {
+						if(el.getValidSince().equals(el.getValidUntil())){
+							el.getSupersededElement().setSupersedingElement(el.getSupersedingElement());
+						}
+					}
+				}
+			}
+				
+			
 
 			resource.save(null);
 			getFile().touch(null);
@@ -104,23 +126,14 @@ public class DwGraphicalFeatureModelEditor extends DwGraphicalFeatureModelViewer
 	}
 
 
-
-
-
+	@Override
 	protected KeyHandler getCommonKeyHandler() {
-		sharedKeyHandler = super.getCommonKeyHandler();
-
-		if (sharedKeyHandler == null) {
-			sharedKeyHandler = new KeyHandler();
-		}
+				
+		KeyHandler handler = super.getCommonKeyHandler();
+		handler.put(KeyStroke.getPressed(SWT.F2, 0), getActionRegistry().getAction(GEFActionConstants.DIRECT_EDIT));		
 		
-		sharedKeyHandler.put(KeyStroke.getPressed(SWT.DEL, 127, 0), 
-				getActionRegistry().getAction(
-						ActionFactory.DELETE.getId()));
-
-		return sharedKeyHandler;
+		return handler;
 	}
-
 
 	/**
 	 * Hook the evolution factory into the editor logic and override the standard edit part factory
@@ -132,7 +145,6 @@ public class DwGraphicalFeatureModelEditor extends DwGraphicalFeatureModelViewer
 		GraphicalViewer viewer = getGraphicalViewer();
 		viewer.setEditPartFactory(new DwFeatureModelEditorEditPartFactory(viewer, this));
 		viewer.setContextMenu(new DwGraphicalFeatureModelEditorContextMenuProvider(getGraphicalViewer(), getActionRegistry()));
-		viewer.setKeyHandler(new GraphicalViewerKeyHandler(viewer).setParent(getCommonKeyHandler()));
 	}
 
 	@Override
@@ -227,7 +239,7 @@ public class DwGraphicalFeatureModelEditor extends DwGraphicalFeatureModelViewer
 		DwNumberAttributeSetNumberRangeAction rangeAttributeAction = new DwNumberAttributeSetNumberRangeAction(this);
 		getActionRegistry().registerAction(rangeAttributeAction);
 		getSelectionActions().add(rangeAttributeAction.getId());
-		
+
 		DwFeatureDeletePermanentlyAction deleteFeaturePermanentlyAction = new DwFeatureDeletePermanentlyAction(this);
 		getActionRegistry().registerAction(deleteFeaturePermanentlyAction);
 		getSelectionActions().add(deleteFeaturePermanentlyAction.getId());
@@ -236,9 +248,14 @@ public class DwGraphicalFeatureModelEditor extends DwGraphicalFeatureModelViewer
 		getActionRegistry().registerAction(setFeatureLinkAction);
 		getSelectionActions().add(setFeatureLinkAction.getId());
 		
-		createGroupActions();
+		DwFeatureMoveToNewGroupAction moveToNewGroupAction = new DwFeatureMoveToNewGroupAction(this);
+		getActionRegistry().registerAction(moveToNewGroupAction);
+		getSelectionActions().add(moveToNewGroupAction.getId());
+		
+		getSelectionActions().add(GEFActionConstants.DIRECT_EDIT);
 		createEnumActions();
-
+		createGroupActions();
+		
 		super.createActions();
 	}
 
@@ -255,7 +272,7 @@ public class DwGraphicalFeatureModelEditor extends DwGraphicalFeatureModelViewer
 		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 
 		EModelService service = window.getService(EModelService.class);
-		
+
 
 		if(secondEditor == null){
 			secondEditor = getPartStack(editorToInsert);
@@ -268,14 +285,14 @@ public class DwGraphicalFeatureModelEditor extends DwGraphicalFeatureModelViewer
 			if(secondEditor.getChildren().isEmpty()){
 				//secondEditor.getParent().getChildren().remove(secondEditor);
 				secondEditor = null;
-				
+
 				insertEditor(ratio, where, containerEditor, editorToInsert);
 			}else{
 				secondEditor.getChildren().add(editorToInsert);	
 			}
 		}
 	}
-
+	
 	private MPartStack getPartStack(MPart childPart) {
 		MStackElement stackElement = childPart;
 		MPartStack newStack = BasicFactoryImpl.eINSTANCE.createPartStack();
@@ -298,9 +315,9 @@ public class DwGraphicalFeatureModelEditor extends DwGraphicalFeatureModelViewer
 	public IPath getPathToEditorRelatedFileWithFileExtension(String fileExtension){
 		return getPathFromEditorRelatedFile().removeFileExtension().addFileExtension(fileExtension);
 	}
-	
 
-	
+
+
 	/**
 	 * Opens the default editor for the given file extension side by side with the currently
 	 * active editor
@@ -340,7 +357,7 @@ public class DwGraphicalFeatureModelEditor extends DwGraphicalFeatureModelViewer
 			}
 		}
 	}
-	
+
 	private void closeRelatedEditors(){
 		IEditorReference[] refs = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getEditorReferences();
 
@@ -349,13 +366,12 @@ public class DwGraphicalFeatureModelEditor extends DwGraphicalFeatureModelViewer
 			for(IEditorReference ref : refs){
 				IEditorPart part = ref.getEditor(false);
 
-				if(part != null)
+				if(part != null) {
 					if(part.getEditorInput() instanceof FileEditorInput){
 						FileEditorInput editorInput = (FileEditorInput)part.getEditorInput();
 
 						if(editorInput.getPath().equals(ResourcesPlugin.getWorkspace().getRoot().getLocation().append(path))){
 							if(part.getSite().getPage().closeEditor(part, true)){
-
 
 								try {
 									InputStream stream = editorInput.getFile().getContents();
@@ -378,6 +394,7 @@ public class DwGraphicalFeatureModelEditor extends DwGraphicalFeatureModelViewer
 							}
 						}
 					}	
+				}
 			}
 		}
 	}

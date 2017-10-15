@@ -1,5 +1,6 @@
 package de.darwinspl.feature.graphical.editor.policies.feature;
 
+import org.eclipse.gef.Request;
 import org.eclipse.gef.commands.Command;
 import org.eclipse.gef.editpolicies.DirectEditPolicy;
 import org.eclipse.gef.requests.DirectEditRequest;
@@ -26,5 +27,11 @@ public class DwFeatureDirectEditPolicy extends DirectEditPolicy {
 		String value = (String) request.getCellEditor().getValue();
 		DwFeatureFigure figure = (DwFeatureFigure)getHostFigure();
 		figure.getLabel().setText(value);
+	}
+	
+	@Override
+	public boolean understandsRequest(Request request) {
+		System.out.println(request);
+		return super.understandsRequest(request);
 	}
 }

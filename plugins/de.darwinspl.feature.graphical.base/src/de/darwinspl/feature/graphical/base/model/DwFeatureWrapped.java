@@ -101,9 +101,9 @@ public class DwFeatureWrapped extends DwEditorChangeableElement{
 	public void updateVisibillity(Date date) {
 		for(DwParentChildConnection connection : getParentConnections(date)) {
 			if(connection.getSource().isHideChildren()) {
-				visible = false;
+				//visible = false;
 			}else {
-				visible = true;
+				//visible = true;
 			}
 		}
 	}
@@ -113,12 +113,8 @@ public class DwFeatureWrapped extends DwEditorChangeableElement{
 		this.visible = visible;
 		
 		for(DwParentChildConnection connection : getChildrenConnections(date)){
-			if(visible){
-				if(!hideChildren)
+			if(visible && !hideChildren){
 					connection.getTarget().setVisible(true, date);
-				else{
-					connection.getTarget().setVisible(false, date);
-				}
 			}else{
 				connection.getTarget().setVisible(false, date);
 			}

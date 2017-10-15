@@ -68,6 +68,7 @@ public class DwFeatureEditPart extends DwAbstractEditPart implements NodeEditPar
 								
 				if(notification instanceof DwRepaintNotification) {
 					refreshVisuals();
+					figure.setVisible(((DwFeatureWrapped)getModel()).isVisible());
 				}
 
 			}
@@ -240,9 +241,7 @@ public class DwFeatureEditPart extends DwAbstractEditPart implements NodeEditPar
 		DwFeatureWrapped wrappedFeature = (DwFeatureWrapped)this.getModel();		
 		wrappedFeature.updateVisibillity(editor.getCurrentSelectedDate());
 		
-		super.refreshVisibility();
-		
-		figure.setVisible(wrappedFeature.isVisible());
+		super.refreshVisibility();		
 	}
 
 	private void updateFigure(){
@@ -295,13 +294,6 @@ public class DwFeatureEditPart extends DwAbstractEditPart implements NodeEditPar
 		DwGraphicalFeatureModelViewer editor = (DwGraphicalFeatureModelViewer)this.editor;
 		Date date = editor.getCurrentSelectedDate();
 		
-		if(model.getParentConnections(date).size() > 1) {
-			int index = 0;
-			for(DwParentChildConnection c : model.getParentConnections(date)) {
-				System.out.println(index+"  "+c.getValidSince()+"  "+c.getValidUntil()+"  "+c.getSource().getWrappedModelElement().getNames().get(0).getName()+"  "+c.getTarget().getWrappedModelElement().getNames().get(0).getName());
-				index++;
-			}
-		}
 		return model.getParentConnections(date);
 	}
 

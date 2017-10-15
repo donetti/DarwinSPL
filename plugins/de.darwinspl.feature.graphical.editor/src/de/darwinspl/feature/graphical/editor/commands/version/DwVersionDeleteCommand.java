@@ -10,11 +10,9 @@ public class DwVersionDeleteCommand extends Command {
 	private HyVersion version;
 	
 	private DwGraphicalFeatureModelViewer editor;
-	private HyVersion parentVersion;
 	
 	public DwVersionDeleteCommand(HyVersion version, DwGraphicalFeatureModelViewer editor)  {
 		this.editor = editor;
-		this.parentVersion = version;
 	}
 
 

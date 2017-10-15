@@ -109,6 +109,14 @@ public class DwAttributeEditPart extends DwAbstractEditPart{
 		return layout;
 	}
 	
+	public void refreshVisuals(boolean updateParent) {
+		refreshVisuals();
+		
+		if(updateParent) {
+			((DwFeatureEditPart)this.getParent()).refreshVisuals();
+		}
+	}
+	
 	@Override
 	public void refreshVisuals(){
 		super.refreshVisuals();
@@ -125,7 +133,6 @@ public class DwAttributeEditPart extends DwAbstractEditPart{
 			// TODO show error that no name for the attribute exist at this timestamp
 		}
 		
-		((DwAttributeFigure)getFigure()).update();
-	
+		((DwAttributeFigure)getFigure()).update();	
 	}
 }

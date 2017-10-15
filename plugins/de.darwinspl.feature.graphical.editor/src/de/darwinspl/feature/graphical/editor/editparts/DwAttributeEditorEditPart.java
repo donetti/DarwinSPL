@@ -11,6 +11,7 @@ import org.eclipse.jface.viewers.TextCellEditor;
 
 import de.darwinspl.feature.graphical.base.editor.DwGraphicalFeatureModelViewer;
 import de.darwinspl.feature.graphical.base.editparts.DwAttributeEditPart;
+import de.darwinspl.feature.graphical.base.editparts.DwFeatureEditPart;
 import de.darwinspl.feature.graphical.base.figures.DwAttributeFigure;
 import de.darwinspl.feature.graphical.base.model.DwFeatureModelWrapped;
 import de.darwinspl.feature.graphical.editor.locators.DwAttributeCellEditorLocator;
@@ -27,16 +28,20 @@ public class DwAttributeEditorEditPart extends DwAttributeEditPart {
 	public DwAttributeEditorEditPart(DwGraphicalFeatureModelViewer editor, DwFeatureModelWrapped featureModel) {
 		super(editor, featureModel);
 		adapter = new HyAttributeAdapter();
+		
+		
 	}
 
 	public class HyAttributeAdapter implements Adapter {
 
 		// Adapter interface
 		@Override 
-		public void notifyChanged(Notification notification) {
+		public void notifyChanged(Notification notification) {		
 			if((notification.getEventType() == Notification.ADD || notification.getEventType() == Notification.REMOVE) && 
 			   (notification.getNewValue() instanceof HyName || notification.getOldValue() instanceof HyName)){
+					
 				refreshVisuals();
+				((DwFeatureEditPart)getParent()).refreshVisuals();
 				//((DwFeatureEditPart)getParent()).propertyChange(new PropertyChangeEvent(this, "AttributeSizeChanged", figure.getBounds(), new Rectangle(0, 0, 0, 0)));
 				
 			

@@ -4,9 +4,12 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -24,6 +27,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.draw2d.geometry.Point;
 
+import de.christophseidl.util.ecore.EcoreIOUtil;
 import de.darwinspl.feature.graphical.base.model.DwFeatureModelWrapped;
 import de.darwinspl.feature.graphical.base.model.DwFeatureWrapped;
 import de.darwinspl.feature.graphical.base.model.DwTemporalPosition;
@@ -151,6 +155,7 @@ public class DwFeatureModelLayoutFileUtil {
 			if(file.exists()){
 				try {
 					List<String> lines = Files.readAllLines(Paths.get(file.getPath()), Charset.defaultCharset());
+					
 					for(String line : lines){
 						List<Object> container = parseLine(line);
 
@@ -180,6 +185,7 @@ public class DwFeatureModelLayoutFileUtil {
 		}
 	}
 	
+
 	/**
 	 * Saves all positions for each feature of the selected feature model into a layout file.
 	 * The file has the same name as the feature model (with "*.hylaout" file extension) and the
@@ -197,16 +203,21 @@ public class DwFeatureModelLayoutFileUtil {
 		
 		IPath path = ((IPath)file.getFullPath().clone()).removeFileExtension().addFileExtension("hylayout");
 
-		String fileContent = "";
+		StringBuilder builder = new StringBuilder();		
 		for(DwFeatureWrapped featureWrapped : featureModel.getFeatures(null)){
 			DwTemporalPosition position = featureWrapped.getFirstPosition();
 			
 			do{
-				fileContent += featureWrapped.getWrappedModelElement().getId()+","+
-						   (position.getValidSince() != null ? dateFormat.format(position.getValidSince()) : "null")+","+
-						   (position.getValidUntil() != null ? dateFormat.format(position.getValidUntil()) : "null")+","+
-						   position.getPosition().x()+","+
-						   position.getPosition().y()+"\n";				
+				builder.append(featureWrapped.getWrappedModelElement().getId());
+				builder.append(",");
+				builder.append((position.getValidSince() != null ? dateFormat.format(position.getValidSince()) : "null"));
+				builder.append(",");
+				builder.append((position.getValidUntil() != null ? dateFormat.format(position.getValidUntil()) : "null"));
+				builder.append(",");
+				builder.append(position.getPosition().x());
+				builder.append(",");
+				builder.append(position.getPosition().y());
+				builder.append("\n");			
 				
 				position = position.getSuccessor();
 			}while(position != null);
@@ -214,7 +225,7 @@ public class DwFeatureModelLayoutFileUtil {
 
 		file = workspaceRoot.getFile(path);
 
-		InputStream source = new ByteArrayInputStream(fileContent.getBytes());
+		InputStream source = new ByteArrayInputStream(builder.toString().getBytes());
 		try {
 			if(!file.exists()){
 				file.create(source, IResource.NONE, null);

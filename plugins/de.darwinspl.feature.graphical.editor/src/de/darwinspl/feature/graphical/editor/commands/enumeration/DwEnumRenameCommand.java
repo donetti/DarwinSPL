@@ -4,7 +4,6 @@ import org.eclipse.gef.commands.Command;
 
 import de.darwinspl.feature.graphical.base.editor.DwGraphicalFeatureModelViewer;
 import eu.hyvar.dataValues.HyEnum;
-import eu.hyvar.dataValues.HyEnumLiteral;
 
 public class DwEnumRenameCommand extends Command {
 	private HyEnum enumeration;

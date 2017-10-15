@@ -62,6 +62,7 @@ public class DwSelectedConfigurationComposite extends Group {
 					HyFeatureSelected select = (HyFeatureSelected)element;
 					HyName name = HyEvolutionUtil.getValidTemporalElement(select.getSelectedFeature().getNames(), date);
 					
+					if(name != null)
 					text += name.getName() + "\n";
 				}
 				if(element instanceof HyVersionSelected){

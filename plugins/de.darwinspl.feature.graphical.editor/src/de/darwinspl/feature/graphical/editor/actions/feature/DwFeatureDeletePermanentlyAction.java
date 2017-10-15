@@ -9,7 +9,6 @@ import de.darwinspl.feature.graphical.base.editor.DwGraphicalFeatureModelViewer;
 import de.darwinspl.feature.graphical.base.editparts.DwFeatureEditPart;
 import de.darwinspl.feature.graphical.base.editparts.DwRootFeatureEditPart;
 import de.darwinspl.feature.graphical.base.model.DwFeatureWrapped;
-import de.darwinspl.feature.graphical.editor.actions.DwCommandAction;
 import de.darwinspl.feature.graphical.editor.commands.feature.DwFeatureDeletePermanentlyCommand;
 
 public class DwFeatureDeletePermanentlyAction  extends DwFeatureSelectionAction {

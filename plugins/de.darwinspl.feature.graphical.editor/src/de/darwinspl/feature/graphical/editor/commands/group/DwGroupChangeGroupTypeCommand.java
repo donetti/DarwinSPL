@@ -7,10 +7,6 @@ import java.util.List;
 import org.eclipse.emf.ecore.InternalEObject;
 
 import de.darwinspl.feature.graphical.base.editor.DwGraphicalFeatureModelViewer;
-import de.darwinspl.feature.graphical.base.editparts.DwGroupEditPart;
-import de.darwinspl.feature.graphical.base.editparts.DwParentChildConnectionEditPart;
-import de.darwinspl.feature.graphical.base.model.DwGroupWrapped;
-import de.darwinspl.feature.graphical.base.model.DwParentChildConnection;
 import de.darwinspl.feature.graphical.base.model.DwRepaintNotification;
 import de.darwinspl.feature.graphical.editor.commands.DwLinearTemporalElementCommand;
 import de.darwinspl.feature.graphical.editor.util.DwEcoreUtil;
